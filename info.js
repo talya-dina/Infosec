@@ -8,6 +8,7 @@ Office.onReady((info) => {
     }
 });
 
+// מאפשר תצוגה גם ב-GitHub
 if (!window.officeInitialized && (window.location.host.includes('github.io') || window.location.host.includes('localhost'))) {
     if (document.readyState === "complete" || document.readyState === "interactive") {
         initializeApp();
@@ -33,13 +34,13 @@ function renderButtons() {
     requestTypes.forEach(type => {
         const btn = document.createElement("button");
         btn.className = "request-btn";
-        btn.innerHTML = `<span>${type.label}</span>`; // החץ הוסר
-        btn.onclick = () => handleAction(type);
+        btn.innerHTML = `<span>${type.label}</span>`;
+        btn.onclick = () => openNewEmail(type); // פתיחת מייל חדש בלבד
         list.appendChild(btn);
     });
 }
 
-async function handleAction(type) {
+function openNewEmail(type) {
     if (typeof Office === 'undefined' || !Office.context || !Office.context.mailbox) {
         alert("הפעולה זמינה רק מתוך Outlook.");
         return;
@@ -47,29 +48,17 @@ async function handleAction(type) {
 
     const tableHtml = generateCyberTable(type);
 
-    if (Office.context.mailbox.item && Office.context.mailbox.item.body && Office.context.mailbox.item.body.setSelectedDataAsync) {
-        Office.context.mailbox.item.body.setSelectedDataAsync(tableHtml, { coercionType: Office.CoercionType.Html }, (result) => {
-            if (result.status === Office.AsyncResultStatus.Failed) {
-                createNewEmail(type, tableHtml);
-            }
-        });
-    } else {
-        createNewEmail(type, tableHtml);
-    }
-}
-
-function createNewEmail(type, htmlBody) {
     Office.context.mailbox.displayNewMessageForm({
         toRecipients: ["info@ofirsec.co.il"],
         subject: type.subject,
-        htmlBody: htmlBody
+        htmlBody: tableHtml
     });
 }
 
 function generateCyberTable(type) {
     const rows = type.questions.map(q => `
         <tr>
-            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #f8f9fa; color: #1a2a3a; font-weight: bold; width: 35%; text-align: right;">${q}</td>
+            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #f8f9fa; color: #1a2a3a; font-weight: bold; width: 35%; text-align: right;">${q}:</td>
             <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #ffffff; text-align: right;"></td>
         </tr>
     `).join("");
@@ -79,7 +68,7 @@ function generateCyberTable(type) {
             <div style="background-color: #001529; color: #ffffff; padding: 15px; border-radius: 8px 8px 0 0; border-bottom: 4px solid #0078d4; text-align: right;">
                 <h2 style="margin: 0; font-size: 18px;">בקשה בנושא: ${type.label.replace(/[^\u0590-\u05FF\s]/g, '').trim()}</h2>
             </div>
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #1a2a3a; direction: rtl;">
+            <table dir="rtl" style="width: 100%; border-collapse: collapse; border: 1px solid #1a2a3a;">
                 ${rows}
             </table>
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eeeeee; text-align: right;">
