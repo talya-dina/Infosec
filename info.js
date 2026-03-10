@@ -33,8 +33,7 @@ function renderButtons() {
     requestTypes.forEach(type => {
         const btn = document.createElement("button");
         btn.className = "request-btn";
-        // הוספת החץ כאן
-        btn.innerHTML = `<span class="btn-text">${type.label}</span><span class="btn-arrow">←</span>`;
+        btn.innerHTML = `<span>${type.label}</span>`; // החץ הוסר
         btn.onclick = () => handleAction(type);
         list.appendChild(btn);
     });
@@ -48,17 +47,13 @@ async function handleAction(type) {
 
     const tableHtml = generateCyberTable(type);
 
-    // בדיקה אם אנחנו במצב כתיבת מייל (Compose) או קריאה (Read)
-    if (Office.context.mailbox.item.itemType === Office.MailboxEnums.ItemType.Message && Office.context.mailbox.item.displayNewMessageForm === undefined) {
-        // אנחנו בתוך מייל פתוח - נזריק את הטבלה
+    if (Office.context.mailbox.item && Office.context.mailbox.item.body && Office.context.mailbox.item.body.setSelectedDataAsync) {
         Office.context.mailbox.item.body.setSelectedDataAsync(tableHtml, { coercionType: Office.CoercionType.Html }, (result) => {
             if (result.status === Office.AsyncResultStatus.Failed) {
-                // אם ההזרקה נכשלה (למשל המייל לא במצב עריכה), נפתח מייל חדש
                 createNewEmail(type, tableHtml);
             }
         });
     } else {
-        // אנחנו לא בתוך מייל - נפתח חלון חדש
         createNewEmail(type, tableHtml);
     }
 }
@@ -74,20 +69,20 @@ function createNewEmail(type, htmlBody) {
 function generateCyberTable(type) {
     const rows = type.questions.map(q => `
         <tr>
-            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #f8f9fa; color: #1a2a3a; font-weight: bold; width: 35%;">${q}</td>
-            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #ffffff;"></td>
+            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #f8f9fa; color: #1a2a3a; font-weight: bold; width: 35%; text-align: right;">${q}</td>
+            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #ffffff; text-align: right;"></td>
         </tr>
     `).join("");
 
     return `
-        <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 600px; color: #1a2a3a; line-height: 1.6;">
-            <div style="background-color: #001529; color: #ffffff; padding: 15px; border-radius: 8px 8px 0 0; border-bottom: 4px solid #0078d4;">
-                <h2 style="margin: 0; font-size: 18px;">בקשה בנושא: ${type.label.replace(/[^א-ת\s]/g, '').trim()}</h2>
+        <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 600px; color: #1a2a3a; line-height: 1.6; text-align: right;">
+            <div style="background-color: #001529; color: #ffffff; padding: 15px; border-radius: 8px 8px 0 0; border-bottom: 4px solid #0078d4; text-align: right;">
+                <h2 style="margin: 0; font-size: 18px;">בקשה בנושא: ${type.label.replace(/[^\u0590-\u05FF\s]/g, '').trim()}</h2>
             </div>
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #1a2a3a;">
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #1a2a3a; direction: rtl;">
                 ${rows}
             </table>
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eeeeee;">
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eeeeee; text-align: right;">
                 <p style="margin: 0; font-weight: bold; color: #001529;">תודה רבה על שיתוף הפעולה!</p>
                 <p style="margin: 5px 0; color: #0078d4;">צוות אבטחת מידע OFIRSEC</p>
                 <img src="https://ofirsec.co.il/wp-content/uploads/2024/06/logo-big-cyber-1-1-768x336.png" alt="OFIRSEC Logo" style="width: 180px; margin-top: 10px;">
