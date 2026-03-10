@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>פורמטים לאבטחת מידע</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f3f2f1; /* צבע רקע עדין של אופיס */
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        #container {
+            padding: 20px;
+        }
+
+        .header {
+            border-bottom: 2px solid #0078d4;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            font-size: 20px;
+            color: #323130;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #605e5c;
+            margin-top: 5px;
+        }
+
+        #button-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* עיצוב הכפתורים */
+        .request-btn {
+            background-color: #ffffff;
+            color: #323130;
+            border: 1px solid #8a8886;
+            border-radius: 4px;
+            padding: 12px 15px;
+            text-align: right;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: b;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .request-btn:hover {
+            background-color: #0078d4;
+            color: #ffffff;
+            border-color: #0078d4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .request-btn:active {
+            transform: translateY(0);
+        }
+
+        /* אייקון קטן ליד הטקסט (אופציונלי) */
+        .btn-icon {
+            margin-left: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div class="header">
+        <h2>פורמטים לאבטחת מידע</h2>
+        <p class="subtitle">לחץ על הנושא הרלוונטי ליצירת מייל בקשה:</p>
+    </div>
+    
+    <div id="button-list">
+        </div>
+</div>
+
+</body>
+</html>
