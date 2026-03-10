@@ -1,10 +1,15 @@
+// וידוא שהסביבה של אופיס מוכנה
 Office.onReady((info) => {
     if (info.host === Office.HostType.Outlook) {
-        renderButtons();
+        // אם הדף כבר נטען, נריץ מיד. אם לא, נחכה לטעינה.
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            renderButtons();
+        } else {
+            document.addEventListener("DOMContentLoaded", renderButtons);
+        }
     }
 });
 
-// ריכוז כל הנתונים מהמסמך שלך
 const requestTypes = [
     {
         id: "internet",
@@ -90,41 +95,39 @@ const requestTypes = [
     }
 ];
 
-// פונקציה ליצירת הכפתורים בחלונית
 function renderButtons() {
     const list = document.getElementById("button-list");
     if (!list) return;
 
+    // ניקוי הרשימה לפני הוספה (למניעת כפילויות)
+    list.innerHTML = "";
+
     requestTypes.forEach(type => {
         const btn = document.createElement("button");
-        btn.className = "request-btn"; // משתמש ב-CSS החדש שכתבנו
+        btn.className = "request-btn";
         btn.innerHTML = `<span>${type.label}</span>`;
-        
         btn.onclick = () => openEmailForm(type);
         list.appendChild(btn);
     });
 }
 
-// פונקציה לפתיחת המייל עם הטבלה
 function openEmailForm(type) {
-    // בניית שורות הטבלה על בסיס השאלות של אותו נושא
     let tableRows = type.questions.map(q => `
         <tr>
-            <td style="border: 1px solid #cccccc; padding: 10px; background-color: #f2f2f2; width: 40%; font-weight: bold;">${q}:</td>
-            <td style="border: 1px solid #cccccc; padding: 10px;"></td>
+            <td style="border: 1px solid #cccccc; padding: 10px; background-color: #f2f2f2; width: 40%; font-weight: bold; text-align: right;">${q}:</td>
+            <td style="border: 1px solid #cccccc; padding: 10px; text-align: right;"></td>
         </tr>
     `).join("");
 
-    // בניית גוף המייל המלא ב-HTML
     const htmlBody = `
-        <div dir="rtl" style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
+        <div dir="rtl" style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; text-align: right;">
             <p>שלום רב,</p>
             <p>להלן פרטי בקשה בנושא: <strong>${type.label.replace(/[^א-ת\s]/g, '').trim()}</strong></p>
-            <table style="border-collapse: collapse; width: 100%; max-width: 650px; border: 1px solid #cccccc; text-align: right;">
+            <table dir="rtl" style="border-collapse: collapse; width: 100%; max-width: 650px; border: 1px solid #cccccc;">
                 <thead>
                     <tr style="background-color: #0078d4; color: white;">
-                        <th style="padding: 10px; border: 1px solid #cccccc;">שדה</th>
-                        <th style="padding: 10px; border: 1px solid #cccccc;">מידע למילוי</th>
+                        <th style="padding: 10px; border: 1px solid #cccccc; text-align: right;">שדה</th>
+                        <th style="padding: 10px; border: 1px solid #cccccc; text-align: right;">מידע למילוי</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -132,13 +135,12 @@ function openEmailForm(type) {
                 </tbody>
             </table>
             <br>
-            <p style="color: #666;">המייל נשלח באמצעות תוסף "פורמטים לאבטחת מידע".</p>
+            <p style="color: #666;">המייל נשלח באמצעות תוסף "InfoSec".</p>
         </div>
     `;
 
-    // פקודת ה-Office לפתיחת חלון הודעה חדשה
     Office.context.mailbox.displayNewMessageForm({
-        toRecipients: ["InfoSec@your-org.com"], // עדכני כאן את כתובת המייל שלכם
+        toRecipients: ["InfoSec@your-org.com"], 
         subject: type.subject,
         htmlBody: htmlBody
     });
