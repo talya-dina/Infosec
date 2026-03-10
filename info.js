@@ -35,7 +35,7 @@ function renderButtons() {
         const btn = document.createElement("button");
         btn.className = "request-btn";
         btn.innerHTML = `<span>${type.label}</span>`;
-        btn.onclick = () => openNewEmail(type); // פתיחת מייל חדש בלבד
+        btn.onclick = () => openNewEmail(type);
         list.appendChild(btn);
     });
 }
@@ -46,11 +46,15 @@ function openNewEmail(type) {
         return;
     }
 
+    // יצירת Timestamp/ID ייחודי
+    const uniqueId = Date.now();
+    const fullSubject = `OFIRSEC Security (ID: ${uniqueId}) - ${type.subject}`;
+    
     const tableHtml = generateCyberTable(type);
 
     Office.context.mailbox.displayNewMessageForm({
         toRecipients: ["info@ofirsec.co.il"],
-        subject: type.subject,
+        subject: fullSubject,
         htmlBody: tableHtml
     });
 }
@@ -58,23 +62,26 @@ function openNewEmail(type) {
 function generateCyberTable(type) {
     const rows = type.questions.map(q => `
         <tr>
-            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #f8f9fa; color: #1a2a3a; font-weight: bold; width: 35%; text-align: right;">${q}:</td>
-            <td style="border: 1px solid #1a2a3a; padding: 12px; background-color: #ffffff; text-align: right;"></td>
+            <td style="border: 1px solid #e0e0e0; padding: 15px; background-color: #fcfcfc; color: #333333; font-weight: bold; width: 40%; text-align: right; font-size: 14px;">${q}:</td>
+            <td style="border: 1px solid #e0e0e0; padding: 15px; background-color: #ffffff; text-align: right;"></td>
         </tr>
     `).join("");
 
     return `
-        <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 600px; color: #1a2a3a; line-height: 1.6; text-align: right;">
-            <div style="background-color: #001529; color: #ffffff; padding: 15px; border-radius: 8px 8px 0 0; border-bottom: 4px solid #0078d4; text-align: right;">
-                <h2 style="margin: 0; font-size: 18px;">בקשה בנושא: ${type.label.replace(/[^\u0590-\u05FF\s]/g, '').trim()}</h2>
+        <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Arial, sans-serif; max-width: 650px; color: #333; line-height: 1.6; margin: 0 auto; text-align: right;">
+            <div style="background-color: #f8f9fa; padding: 20px; border: 1px solid #e0e0e0; border-bottom: 5px solid #0078d4; border-radius: 8px 8px 0 0;">
+                <h2 style="margin: 0; font-size: 20px; color: #0078d4;">טופס בקשה: ${type.label.replace(/[^\u0590-\u05FF\s]/g, '').trim()}</h2>
+                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">אנא מלא את הפרטים בטבלה מטה והשב למייל זה.</p>
             </div>
-            <table dir="rtl" style="width: 100%; border-collapse: collapse; border: 1px solid #1a2a3a;">
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 0; border: 1px solid #e0e0e0;">
                 ${rows}
             </table>
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eeeeee; text-align: right;">
-                <p style="margin: 0; font-weight: bold; color: #001529;">תודה רבה על שיתוף הפעולה!</p>
-                <p style="margin: 5px 0; color: #0078d4;">צוות אבטחת מידע OFIRSEC</p>
-                <img src="https://ofirsec.co.il/wp-content/uploads/2024/06/logo-big-cyber-1-1-768x336.png" alt="OFIRSEC Logo" style="width: 180px; margin-top: 10px;">
+
+            <div style="margin-top: 30px; text-align: center; border-top: 1px solid #eeeeee; padding-top: 20px;">
+                <p style="margin: 0; font-size: 16px; font-weight: bold; color: #001529;">תודה רבה על שיתוף הפעולה!</p>
+                <p style="margin: 5px 0 15px 0; color: #0078d4; font-size: 14px;">צוות אבטחת מידע OFIRSEC</p>
+                <img src="https://ofirsec.co.il/wp-content/uploads/2024/06/logo-big-cyber-1-1-768x336.png" alt="OFIRSEC Logo" style="width: 250px; height: auto;">
             </div>
         </div>
     `;
