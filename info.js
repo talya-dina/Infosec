@@ -1,14 +1,25 @@
-// וידוא שהסביבה של אופיס מוכנה
+// פונקציה להפעלת האפליקציה
+function initializeApp() {
+    console.log("מפעיל את רשימת הכפתורים...");
+    renderButtons();
+}
+
+// וידוא שהסביבה של אופיס מוכנה (עבור Outlook)
 Office.onReady((info) => {
-    if (info.host === Office.HostType.Outlook) {
-        // אם הדף כבר נטען, נריץ מיד. אם לא, נחכה לטעינה.
-        if (document.readyState === "complete" || document.readyState === "interactive") {
-            renderButtons();
-        } else {
-            document.addEventListener("DOMContentLoaded", renderButtons);
-        }
+    if (info.host) {
+        console.log("התוסף רץ בתוך Office");
+        initializeApp();
     }
 });
+
+// מאפשר לראות את הכפתורים גם בדפדפן רגיל (עבור בדיקות ב-GitHub)
+if (!window.officeInitialized && (window.location.host.includes('github.io') || window.location.host.includes('localhost'))) {
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        initializeApp();
+    } else {
+        document.addEventListener("DOMContentLoaded", initializeApp);
+    }
+}
 
 const requestTypes = [
     {
@@ -99,7 +110,7 @@ function renderButtons() {
     const list = document.getElementById("button-list");
     if (!list) return;
 
-    // ניקוי הרשימה לפני הוספה (למניעת כפילויות)
+    // ניקוי הרשימה לפני הוספה
     list.innerHTML = "";
 
     requestTypes.forEach(type => {
@@ -112,6 +123,12 @@ function renderButtons() {
 }
 
 function openEmailForm(type) {
+    // בדיקה אם הפונקציה רצה מחוץ לאופיס
+    if (!Office.context || !Office.context.mailbox) {
+        alert("פונקציית שליחת המייל זמינה רק מתוך Outlook. בדפדפן ניתן רק לצפות בעיצוב הכפתורים.");
+        return;
+    }
+
     let tableRows = type.questions.map(q => `
         <tr>
             <td style="border: 1px solid #cccccc; padding: 10px; background-color: #f2f2f2; width: 40%; font-weight: bold; text-align: right;">${q}:</td>
